@@ -5,14 +5,38 @@ const NEWSDATA_API_KEY = import.meta.env.VITE_NEWSDATA_API_KEY;
 const GNEWS_API_KEY = import.meta.env.VITE_GNEWS_API_KEY;
 const MEDIASTACK_API_KEY = import.meta.env.VITE_MEDIASTACK_API_KEY;
 
-// Fallback images if none provided
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1495020689067-958852a7765e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+// High-quality static fallback images by category
+const categoryImages = {
+  world: 'https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?auto=format&fit=crop&w=800&q=80',
+  technology: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+  business: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=800&q=80',
+  sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80',
+};
+
+const generalImages = [
+  'https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=800&q=80', // Newspapers
+  'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80', // News on phone
+  'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80', // Reading news
+  'https://images.unsplash.com/photo-1572949645841-094f3a9c4c94?auto=format&fit=crop&w=800&q=80'  // Global news
+];
+
+const getFallbackImage = (category, title) => {
+  const cat = category?.toLowerCase() || 'general';
+  if (cat.includes('tech')) return categoryImages.technology;
+  if (cat.includes('business') || cat.includes('finance')) return categoryImages.business;
+  if (cat.includes('sport')) return categoryImages.sports;
+  if (cat.includes('world')) return categoryImages.world;
+  
+  const index = title ? title.length % generalImages.length : 0;
+  return generalImages[index];
+};
 
 // Helper to normalize data
 const normalizeArticle = (article, sourceName) => {
   const id = article.url || article.link || article.source_id || Math.random().toString(36).substr(2, 9);
   const title = article.title || 'Untitled';
-  const fallbackImage = `https://picsum.photos/seed/${encodeURIComponent(title.substring(0, 20))}/800/500`;
+  const category = article.category?.[0] || 'general';
+  const fallbackImage = getFallbackImage(category, title);
   
   return {
     id,
@@ -21,7 +45,7 @@ const normalizeArticle = (article, sourceName) => {
     content: article.content || article.full_description || '',
     image: article.image_url || article.image || article.urlToImage || fallbackImage,
     source: article.source_id || article.source?.name || sourceName,
-    category: article.category?.[0] || 'general',
+    category,
     url: article.url || article.link || '#',
     publishedAt: article.pubDate || article.publishedAt || new Date().toISOString(),
   };
@@ -139,17 +163,21 @@ export const fetchAllNews = async (category = 'general') => {
       "Space agency confirms plans to launch the first crewed mission to Mars within the next decade."
     ];
 
-    const mockData = Array(60).fill(null).map((_, i) => ({
-      id: `mock-${i}`,
-      title: mockHeadlines[i % mockHeadlines.length] + (i >= mockHeadlines.length ? ` (Update ${i})` : ''),
-      description: mockDescriptions[i % mockDescriptions.length],
-      content: `${mockDescriptions[i % mockDescriptions.length]} This is a simulated article content provided because actual news feeds could not be reached.`,
-      image: `https://picsum.photos/seed/mock_news_v2_${i}/800/500`,
-      source: i % 3 === 0 ? 'BBC News' : i % 3 === 1 ? 'Reuters' : 'CNN',
-      category: i % 4 === 0 ? 'world' : i % 4 === 1 ? 'technology' : i % 4 === 2 ? 'business' : 'sports',
-      url: '#',
-      publishedAt: new Date(Date.now() - i * 3600000).toISOString(),
-    }));
+    const mockData = Array(60).fill(null).map((_, i) => {
+      const cat = i % 4 === 0 ? 'world' : i % 4 === 1 ? 'technology' : i % 4 === 2 ? 'business' : 'sports';
+      const title = mockHeadlines[i % mockHeadlines.length] + (i >= mockHeadlines.length ? ` (Update ${i})` : '');
+      return {
+        id: `mock-${i}`,
+        title,
+        description: mockDescriptions[i % mockDescriptions.length],
+        content: `${mockDescriptions[i % mockDescriptions.length]} This is a simulated article content provided because actual news feeds could not be reached.`,
+        image: getFallbackImage(cat, title),
+        source: i % 3 === 0 ? 'BBC News' : i % 3 === 1 ? 'Reuters' : 'CNN',
+        category: cat,
+        url: '#',
+        publishedAt: new Date(Date.now() - i * 3600000).toISOString(),
+      };
+    });
     return [...uniqueArticles, ...mockData];
   }
 
