@@ -32,7 +32,9 @@ const CategoryPage = () => {
       {articles.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {articles.map((article, index) => (
-            <NewsCard key={`${article.id}-${index}`} article={article} isLarge={index === 0} />
+            <div key={`${article.id}-${index}`} className={index === 0 ? "md:col-span-2 lg:col-span-2 xl:col-span-2" : ""}>
+              <NewsCard article={article} isLarge={index === 0} />
+            </div>
           ))}
         </div>
       ) : (
