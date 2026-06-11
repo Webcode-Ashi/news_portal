@@ -8,6 +8,7 @@ import CategoryPage from './pages/CategoryPage'
 import NewsDetailsPage from './pages/NewsDetailsPage'
 import SearchPage from './pages/SearchPage'
 import TrendingPage from './pages/TrendingPage'
+import SavedPage from './pages/SavedPage'
 
 function App() {
   const isDarkMode = useSelector(state => state.theme.isDarkMode)
@@ -30,6 +31,7 @@ function App() {
           <Route path="/news/:id" element={<NewsDetailsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/trending" element={<TrendingPage />} />
+          <Route path="/saved" element={<SavedPage />} />
         </Routes>
       </main>
       <Footer />

@@ -62,6 +62,7 @@ const Navbar = () => {
           <NavItem to="/category/business">Business</NavItem>
           <NavItem to="/category/sports">Sports</NavItem>
           <NavItem to="/trending" isSpecial={true}>Trending</NavItem>
+          <NavItem to="/saved">Saved</NavItem>
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -93,6 +94,7 @@ const Navbar = () => {
           <NavItem to="/category/business" onClick={closeMenu}>Business</NavItem>
           <NavItem to="/category/sports" onClick={closeMenu}>Sports</NavItem>
           <NavItem to="/trending" isSpecial={true} onClick={closeMenu}>Trending Now</NavItem>
+          <NavItem to="/saved" onClick={closeMenu}>Saved Articles</NavItem>
         </nav>
         
         <div className="mt-auto p-8 text-center text-red-300 text-xs font-semibold uppercase tracking-widest border-t border-red-800/50">

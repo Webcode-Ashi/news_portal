@@ -57,12 +57,27 @@ const NewsDetailsPage = () => {
             </div>
             <div className="flex items-center gap-4">
               <button 
-                onClick={() => dispatch(toggleBookmark(article))}
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch(toggleBookmark(article));
+                }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold transition-all ${isBookmarked ? 'text-white bg-primary shadow-md hover:bg-red-700' : 'text-gray-500 bg-gray-50 hover:bg-red-50 hover:text-primary'}`}
               >
                 <FiBookmark className={isBookmarked ? 'fill-current' : ''} /> {isBookmarked ? 'Saved' : 'Save'}
               </button>
-              <button className="flex items-center gap-2 text-gray-500 bg-gray-50 hover:bg-red-50 px-4 py-2 rounded-full font-bold hover:text-primary transition-all">
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  const shareUrl = window.location.origin + `/news/${encodeURIComponent(article.id)}`;
+                  if (navigator.share) {
+                    navigator.share({ title: article.title, url: shareUrl }).catch(err => console.log('Share failed:', err));
+                  } else {
+                    navigator.clipboard.writeText(shareUrl);
+                    alert("Link copied to clipboard!");
+                  }
+                }}
+                className="flex items-center gap-2 text-gray-500 bg-gray-50 hover:bg-red-50 px-4 py-2 rounded-full font-bold hover:text-primary transition-all"
+              >
                 <FiShare2 /> Share
               </button>
             </div>

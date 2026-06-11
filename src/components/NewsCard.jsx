@@ -45,13 +45,31 @@ const NewsCard = ({ article, isLarge = false }) => {
           <span className="text-xs text-gray-400 font-bold tracking-wide">{Math.max(1, Math.ceil(article.content.length / 1000))} MIN READ</span>
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => dispatch(toggleBookmark(article))}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dispatch(toggleBookmark(article));
+              }}
               className={`p-2 rounded-full hover:bg-red-50 transition-colors ${isBookmarked ? 'text-primary bg-red-50' : 'text-gray-400'}`}
               aria-label="Bookmark"
             >
               <FiBookmark className={isBookmarked ? 'fill-current' : ''} />
             </button>
-            <button className="p-2 rounded-full text-gray-400 hover:text-primary hover:bg-red-50 transition-colors" aria-label="Share">
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const shareUrl = window.location.origin + `/news/${encodeURIComponent(article.id)}`;
+                if (navigator.share) {
+                  navigator.share({ title: article.title, url: shareUrl }).catch(err => console.log('Share failed:', err));
+                } else {
+                  navigator.clipboard.writeText(shareUrl);
+                  alert("Link copied to clipboard!");
+                }
+              }}
+              className="p-2 rounded-full text-gray-400 hover:text-primary hover:bg-red-50 transition-colors" 
+              aria-label="Share"
+            >
               <FiShare2 />
             </button>
           </div>
